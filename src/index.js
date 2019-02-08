@@ -2,19 +2,16 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class Square extends Component {
-
-    render() {
-        //note the onclick is sent a function, the function fires after the click happens
-        return (
-            <button 
-                className="square" 
-                onClick={() => this.props.onClick() }
-            >
-                {this.props.value}
-            </button>
-        );
-    }
+function Square(props) {
+    //as square components no longer maintain state the square components recieve values from the board component
+    //so the square components are now controller components, the Board component controls them
+    //Square component has been changed to be a function component, this means it does not have state and only has a render method. 
+    //Instead of defining a class which extends Component, we write a function that takes props as input and returns what should be rendered
+    return (
+        <button className="square" onClick={props.onClick}>
+            {props.value}
+        </button>
+    );
 }
 
 class Board extends React.Component {
@@ -23,6 +20,13 @@ class Board extends React.Component {
         this.state = {
             squares: Array(9).fill(null),
         };
+    }
+
+    handleClick(i){
+        //we are replacing the data, not mutating aka directly changing the data's value
+        const squares = this.state.squares.slice();
+        squares[i] = 'X';
+        this.setState({ squares, });
     }
 
     renderSquare(i){
