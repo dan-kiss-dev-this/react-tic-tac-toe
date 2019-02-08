@@ -2,7 +2,26 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-function Square(props) {
+const calculateWinner = (squares) => {
+    const lines = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,4,6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+        const [a,b,c] = lines[i];
+        if (squares[a] && squares[a]=== squares[b] && squares[a] === squares[c]) {
+            return squares[a]
+        }
+    }
+    return null;
+}
+
+const Square = (props) => {
+    //function Square(props) is other way to write in es5
     //as square components no longer maintain state the square components recieve values from the board component
     //so the square components are now controller components, the Board component controls them
     //Square component has been changed to be a function component, this means it does not have state and only has a render method. 
@@ -19,14 +38,21 @@ class Board extends React.Component {
         super(props);
         this.state = {
             squares: Array(9).fill(null),
+            xIsNext: true,
         };
     }
 
     handleClick(i){
         //we are replacing the data, not mutating aka directly changing the data's value
         const squares = this.state.squares.slice();
-        squares[i] = 'X';
-        this.setState({ squares, });
+        if (calculateWinner(squares) || squares[i]) {
+            return;
+        }
+        squares[i] = this.state.xIsNext? 'X': 'O';
+        this.setState({ 
+            squares, 
+            xIsNext: !this.state.xIsNext,
+        });
     }
 
     renderSquare(i){
@@ -39,8 +65,15 @@ class Board extends React.Component {
     }
 
     render() {
-        const status = 'Next Player: X';
-        
+        // let status = 'Next player ' + (this.state.xIsNext ? 'X' : 'O');
+        let status;
+        const winner = calculateWinner(this.state.squares);
+        if (winner) {
+            status = 'Winner: ' + winner;
+        } else {
+            // the paranthesis here means return
+            status = 'Next player ' + (this.state.xIsNext ? 'X' : 'O')
+        }
         return (
             <div>
                 <div className="status">{status}</div>
@@ -84,4 +117,3 @@ ReactDOM.render(
     <Game />,
     document.getElementById('root')
 );
-
